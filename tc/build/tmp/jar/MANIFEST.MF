@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Implementation-Title: Total Commander 1.0
+Implementation-Version: 1.0
+Main-Class: com.total.commander.java.main.Main
+

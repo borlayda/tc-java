@@ -1,0 +1,29 @@
+apply plugin: 'java'
+
+repositories {
+    mavenCentral()
+}
+
+sourceCompatibility = 1.8
+version = '1.0'
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'Total Commander ' + version,
+                'Implementation-Version': version,
+                'Main-Class': 'com.total.commander.java.main.Main'
+    }
+}
+
+uploadArchives {
+    repositories {
+        flatDir {
+            dirs 'result'
+        }
+    }
+}
+
+task runFinalJar(type: JavaExec) {
+    classpath = files('build/libs/tc-'+version+'.jar')
+    classpath += sourceSets.main.runtimeClasspath
+    main = 'com.total.commander.java.main.Main'
+}
