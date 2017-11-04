@@ -84,14 +84,21 @@ public class TCWindow extends JFrame {
     private void initDirList(File directory) {
         ScrollPane scrollPane = new ScrollPane();
         ArrayList<Item> listItems = new ArrayList<>();
+        String name = "..";
+        Item.Type subfileType = Item.Type.Directory;
+        String permissions = (directory.canRead() ? "r" : "-") + (directory.canWrite() ? "w" : "-") + (directory.canExecute() ? "x" : "-");
+        String sha = "Unknown";
+        long size = directory.length();
+        String path = directory.getAbsolutePath();
+        listItems.add(new Item(name, subfileType, permissions, sha, size, path));
         for (String child : directory.list()) {
             File subfile = new File(directory.getPath()+File.separator+child);
-            String name = subfile.getName();
-            Item.Type subfileType = subfile.isDirectory() ? Item.Type.Directory : Item.Type.File;
-            String permissions = (subfile.canRead() ? "r" : "-") + (subfile.canWrite() ? "w" : "-") + (subfile.canExecute() ? "x" : "-");
-            String sha = "Unknown";
-            long size = subfile.length();
-            String path = subfile.getAbsolutePath();
+            name = subfile.getName();
+            subfileType = subfile.isDirectory() ? Item.Type.Directory : Item.Type.File;
+            permissions = (subfile.canRead() ? "r" : "-") + (subfile.canWrite() ? "w" : "-") + (subfile.canExecute() ? "x" : "-");
+            sha = "Unknown";
+            size = subfile.length();
+            path = subfile.getAbsolutePath();
             listItems.add(new Item(name, subfileType, permissions, sha, size, path));
         }
         ElementList elementList = new ElementList(listItems);
@@ -104,6 +111,16 @@ public class TCWindow extends JFrame {
                     Item item = (Item)list.getSelectedValue();
                     ArrayList<Item> listItems = new ArrayList<>();
                     File subdir = new File(item.getPath());
+                    File parent = subdir.getParentFile();
+                    if (parent != null) {
+                        String name = "..";
+                        Item.Type subfileType = Item.Type.Directory;
+                        String permissions = (parent.canRead() ? "r" : "-") + (parent.canWrite() ? "w" : "-") + (parent.canExecute() ? "x" : "-");
+                        String sha = "Unknown";
+                        long size = parent.length();
+                        String path = parent.getAbsolutePath();
+                        listItems.add(new Item(name, subfileType, permissions, sha, size, path));
+                    }
                     if (subdir.isDirectory()) {
                         for (String child : subdir.list()) {
                             File subfile = new File(subdir.getPath() + File.separator + child);
@@ -116,8 +133,7 @@ public class TCWindow extends JFrame {
                             listItems.add(new Item(name, subfileType, permissions, sha, size, path));
                         }
                         ElementList elementList = new ElementList(listItems);
-                        list = new JList(elementList);
-                        list.setCellRenderer(new ItemRenderer());
+                        list.setModel(elementList);
                     } else {
                         JOptionPane.showMessageDialog(null,
                                 "This is not a directory! ("+subdir.getName()+")",
